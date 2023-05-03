@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.d2y.d2yspringapi.repositories.TokenRepository;
-import com.d2y.d2yspringapi.services.JwtServie;
+import com.d2y.d2yspringapi.services.JwtService;
 
 import io.micrometer.common.lang.NonNull;
 import jakarta.servlet.FilterChain;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtServie jwtServie;
+    private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
     private final TokenRepository tokenRepository;
 
@@ -50,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
-        userEmail = jwtServie.extractUsername(jwt);
+        userEmail = jwtService.extractUsername(jwt);
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
@@ -58,7 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .map(token -> !token.isExpired() && !token.isRevoked())
                     .orElse(false);
 
-            if (jwtServie.isTokenValid(jwt, userDetails) && isTokenValid) {
+            if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
