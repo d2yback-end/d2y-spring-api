@@ -1,9 +1,9 @@
 package com.d2y.d2yspringapi.interfaces;
 
-import com.d2y.d2yspringapi.dto.AuthenticationResponse;
 import com.d2y.d2yspringapi.dto.RegisterRequest;
+import com.d2y.d2yspringapi.models.User;
 
 public interface AuthenticationServiceInterface {
 
-    AuthenticationResponse registerUser(RegisterRequest request);
+    User registerUser(RegisterRequest request);
 }
