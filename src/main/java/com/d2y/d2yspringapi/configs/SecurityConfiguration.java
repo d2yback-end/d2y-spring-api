@@ -60,6 +60,7 @@ public class SecurityConfiguration {
                         "/webjars/**",
                         "/swagger-ui.html")
                 .permitAll()
+
                 .requestMatchers("/api/v1/management/**").hasAnyRole(ADMIN.name(), MANAGER.name())
 
                 .requestMatchers(GET, "/api/v1/management/**").hasAnyAuthority(ADMIN_READ.name(), MANAGER_READ.name())

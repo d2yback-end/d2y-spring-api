@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import com.d2y.d2yspringapi.models.User;
 import com.d2y.d2yspringapi.services.AuthenticationService;
-import com.d2y.d2yspringapi.services.UserService;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -36,11 +35,11 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
         // 3. Save the verification token for the user
         authenticationService.saveUserToken(theUser, verificationToken);
         // 4 Build the verification url to be sent to the user
-        String url = event.getApplicationUrl() + "/register/verifyEmail?token=" + verificationToken;
+        String url = event.getApplicationUrl() + "/api/v1/auth/verifyEmail?token=" + verificationToken;
         // 5. Send the email.
         try {
             sendVerificationEmail(url);
-            log.info("Verification Email was Sent!");
+            log.info("Email Verification was Sent!");
         } catch (MessagingException | UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
@@ -55,7 +54,7 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
                 "<p>Thank you for registering with us," + "" +
                 "Please, follow the link below to complete your registration.</p>" +
                 "<a href=\"" + url + "\">Verify your email to activate your account</a>" +
-                "<p> Thank you <br> Users Registration Portal Service";
+                "<p> Thank you <br> D2Y OFFICIAL";
 
         MimeMessage message = mailSender.createMimeMessage();
         var messageHelper = new MimeMessageHelper(message);
