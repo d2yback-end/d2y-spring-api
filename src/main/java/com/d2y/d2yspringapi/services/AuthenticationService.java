@@ -1,6 +1,5 @@
 package com.d2y.d2yspringapi.services;
 
-import java.util.Calendar;
 import java.util.Optional;
 
 import org.springframework.http.HttpHeaders;
@@ -46,6 +45,12 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+    /**
+     * Create a new users
+     * 
+     * @param RegisterRequest request
+     * @return User
+     */
     @Override
     public User registerUser(RegisterRequest request) {
         Optional<User> existUser = userRepository.findByEmail(request.getEmail());
@@ -67,6 +72,14 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         return savedUser;
     }
 
+    /**
+     * Save user token to database
+     * 
+     * @param User   user
+     * @param String jwtToken
+     * @return void
+     */
+    @Override
     public void saveUserToken(User user, String jwtToken) {
         Token token = Token.builder()
                 .user(user)
@@ -79,6 +92,13 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         tokenRepository.save(token);
     }
 
+    /**
+     * Validation token to verified account
+     * 
+     * @param String theToken
+     * @return String
+     */
+    @Override
     public String validateToken(String theToken) {
         Token token = tokenRepository.findByToken(theToken).orElseThrow();
         if (token == null) {
@@ -94,6 +114,13 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         return "valid";
     }
 
+    /**
+     * Login user and send the access token and refresh token
+     * 
+     * @param AuthenticationRequest request
+     * @return AuthenticationResponse
+     */
+    @Override
     public AuthenticationResponse loginUser(AuthenticationRequest request) {
         var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
 
@@ -118,7 +145,14 @@ public class AuthenticationService implements AuthenticationServiceInterface {
                 .build();
     }
 
-    private void revokeAllUserTokens(User user) {
+    /**
+     * Revoke all user tokens
+     * 
+     * @param User user
+     * @return void
+     */
+    @Override
+    public void revokeAllUserTokens(User user) {
         var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
         if (validUserTokens.isEmpty())
             return;
@@ -129,6 +163,14 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         tokenRepository.saveAll(validUserTokens);
     }
 
+    /**
+     * Generate refresh token
+     * 
+     * @param HttpServletRequest  request
+     * @param HttpServletResponse response
+     * @return void
+     */
+    @Override
     public void refreshToken(
             HttpServletRequest request,
             HttpServletResponse response)
@@ -140,7 +182,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
             return;
         }
         // Old method
-        // refreshToken = authHeader.substring(7);
+        /* refreshToken = authHeader.substring(7); */
 
         // New method
         refreshToken = authHeader.split(" ")[1].trim();
@@ -162,6 +204,12 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         }
     }
 
+    /**
+     * Get the current user login
+     * 
+     * @return User
+     */
+    @Override
     @Transactional(readOnly = true)
     public User getCurrentUser() {
         Jwt principal = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -169,6 +217,12 @@ public class AuthenticationService implements AuthenticationServiceInterface {
                 .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getSubject()));
     }
 
+    /**
+     * Check if user has been login
+     * 
+     * @return boolean
+     */
+    @Override
     public boolean isLoggedIn() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
