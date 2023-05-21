@@ -3,16 +3,17 @@ package com.d2y.d2yspringapi.interfaces;
 import java.util.List;
 import java.util.Optional;
 
+import com.d2y.d2yspringapi.models.Role;
 import com.d2y.d2yspringapi.models.User;
 
 public interface UserServiceInterface {
 
     List<User> getAllUsers();
 
-    Optional<User> getUserById(Long id);
+    User getUserById(Integer id);
 
-    User updateUser(User user);
+    void updateUserRole(Integer id, Role newRole);
 
-    void deleteUser(Long id);
+    void deleteUser(Integer id);
 
 }
