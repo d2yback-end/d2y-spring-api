@@ -1,6 +1,5 @@
 package com.d2y.d2yspringapi.controllers;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,7 @@ import com.d2y.d2yspringapi.exceptions.InvalidRoleException;
 import com.d2y.d2yspringapi.models.Role;
 import com.d2y.d2yspringapi.models.User;
 import com.d2y.d2yspringapi.services.UserService;
-// import org.apache.commons.lang3.EnumUtils;
+import com.d2y.d2yspringapi.utils.CustomResponseConfig.CustomResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,68 +28,35 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
   private final UserService userService;
+  private final CustomResponse response;
 
   @GetMapping
   public ResponseEntity<Map<String, Object>> getAllUsers() {
-    List<User> user = userService.getAllUsers();
-    Map<String, Object> responseData = new HashMap<>();
-    responseData.put("users", user);
-
-    Map<String, Object> response = createSuccessResponse("User berhasil ditampilkan!", responseData);
-    return ResponseEntity.ok(response);
+    List<User> users = userService.getAllUsers();
+    return response.createSuccessResponse("User berhasil ditampilkan!", "users", users);
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<Map<String, Object>> getUserById(@PathVariable Integer id) {
     User user = userService.getUserById(id);
-    Map<String, Object> responseData = new HashMap<>();
-    responseData.put("user", user);
-
-    Map<String, Object> response = createSuccessResponse("User berhasil ditampilkan!", responseData);
-    return ResponseEntity.ok(response);
+    return response.createSuccessResponse("User berhasil ditampilkan!", "user", user);
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Map<String, String>> updateUserRole(@PathVariable Integer id,
-      @RequestParam("role") Role role) {
+  public ResponseEntity<Map<String, Object>> updateUserRole(@PathVariable Integer id,
+      @RequestParam("role") Role role) throws InvalidRoleException {
     try {
       userService.updateUserRole(id, role);
-      Map<String, String> response = createSuccessResponse("User Role has been updated!");
-      return ResponseEntity.ok(response);
+      return response.createSuccessResponse("User Role has been updated!");
     } catch (InvalidRoleException e) {
-      Map<String, String> response = createErrorResponse("Invalid Role!");
-      return ResponseEntity.badRequest().body(response);
+      return response.createErrorResponse("Invalid Role!");
     }
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Integer id) {
+  public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable Integer id) {
     userService.deleteUser(id);
-
-    Map<String, String> response = createSuccessResponse("User has been deleted!");
-    return ResponseEntity.ok(response);
+    return response.createSuccessResponse("User has been deleted!");
   }
 
-  private Map<String, String> createSuccessResponse(String message) {
-    Map<String, String> response = new HashMap<>();
-    response.put("status", "success");
-    response.put("message", message);
-
-    return response;
-  }
-
-  private Map<String, String> createErrorResponse(String errorMessage) {
-    Map<String, String> errorResponse = new HashMap<>();
-    errorResponse.put("status", "error");
-    errorResponse.put("message", errorMessage);
-    return errorResponse;
-  }
-
-  private Map<String, Object> createSuccessResponse(String message, Map<String, Object> responseData) {
-    Map<String, Object> response = new HashMap<>();
-    response.put("status", "success");
-    response.put("message", message);
-    response.put("data", responseData);
-    return response;
-  }
 }
