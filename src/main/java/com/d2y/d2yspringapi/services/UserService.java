@@ -1,10 +1,13 @@
 package com.d2y.d2yspringapi.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.d2y.d2yspringapi.exceptions.D2YException;
+import com.d2y.d2yspringapi.exceptions.InvalidRoleException;
 import com.d2y.d2yspringapi.exceptions.UserNotFoundException;
 import com.d2y.d2yspringapi.interfaces.UserServiceInterface;
 import com.d2y.d2yspringapi.models.Role;
@@ -21,7 +24,14 @@ public class UserService implements UserServiceInterface {
 
   @Override
   public List<User> getAllUsers() {
-    return userRepository.findAll();
+    try {
+      List<User> users = new ArrayList<User>();
+      userRepository.findAll().forEach(users::add);
+
+      return users;
+    } catch (Exception e) {
+      throw new D2YException("Gagal mengambil daftar pengguna", e);
+    }
   }
 
   @Override
@@ -31,10 +41,14 @@ public class UserService implements UserServiceInterface {
   }
 
   @Override
-  public void updateUserRole(Integer id, Role newRole) {
+  public void updateUserRole(Integer id, Role role) throws InvalidRoleException {
+    if (role == null) {
+      throw new InvalidRoleException("Invalid Role!");
+    }
+
     User user = findUserById(id);
 
-    user.setRole(newRole);
+    user.setRole(role);
     userRepository.save(user);
   }
 

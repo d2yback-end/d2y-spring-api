@@ -1,7 +1,6 @@
 package com.d2y.d2yspringapi.interfaces;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.d2y.d2yspringapi.models.Role;
 import com.d2y.d2yspringapi.models.User;
