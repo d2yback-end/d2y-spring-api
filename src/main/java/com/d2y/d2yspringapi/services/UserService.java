@@ -1,6 +1,5 @@
 package com.d2y.d2yspringapi.services;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,8 +24,7 @@ public class UserService implements UserServiceInterface {
   @Override
   public List<User> getAllUsers() {
     try {
-      List<User> users = new ArrayList<User>();
-      userRepository.findAll().forEach(users::add);
+      List<User> users = userRepository.findAll();
 
       return users;
     } catch (Exception e) {
@@ -35,13 +33,13 @@ public class UserService implements UserServiceInterface {
   }
 
   @Override
-  public User getUserById(Integer id) {
+  public User getUserById(Long id) {
     User user = findUserById(id);
     return user;
   }
 
   @Override
-  public void updateUserRole(Integer id, Role role) throws InvalidRoleException {
+  public void updateUserRole(Long id, Role role) throws InvalidRoleException {
     if (role == null) {
       throw new InvalidRoleException("Invalid Role!");
     }
@@ -53,12 +51,12 @@ public class UserService implements UserServiceInterface {
   }
 
   @Override
-  public void deleteUser(Integer id) {
+  public void deleteUser(Long id) {
     findUserById(id);
     userRepository.deleteById(id);
   }
 
-  private User findUserById(Integer id) {
+  private User findUserById(Long id) {
     Optional<User> userExists = userRepository.findById(id);
     if (userExists.isPresent()) {
       return userExists.get();

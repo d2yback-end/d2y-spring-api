@@ -37,13 +37,13 @@ public class UserController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Map<String, Object>> getUserById(@PathVariable Integer id) {
+  public ResponseEntity<Map<String, Object>> getUserById(@PathVariable Long id) {
     User user = userService.getUserById(id);
     return response.createSuccessResponse("User berhasil ditampilkan!", "user", user);
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Map<String, Object>> updateUserRole(@PathVariable Integer id,
+  public ResponseEntity<Map<String, Object>> updateUserRole(@PathVariable Long id,
       @RequestParam("role") Role role) throws InvalidRoleException {
     try {
       userService.updateUserRole(id, role);
@@ -54,7 +54,7 @@ public class UserController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable Integer id) {
+  public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable Long id) {
     userService.deleteUser(id);
     return response.createSuccessResponse("User has been deleted!");
   }

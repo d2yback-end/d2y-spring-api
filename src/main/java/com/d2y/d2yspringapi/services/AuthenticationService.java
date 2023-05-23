@@ -53,20 +53,8 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      */
     @Override
     public User registerUser(RegisterRequest request) {
-        Optional<User> existUser = userRepository.findByEmail(request.getEmail());
-        if (existUser.isPresent()) {
-            throw new UserAlreadyExistsException(
-                    "User with email " + request.getEmail() + " already exists");
-        }
-
-        User user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
-                .build();
-
+        validateUserDoesNotExist(request.getEmail());
+        User user = createUserFromRequest(request);
         User savedUser = userRepository.save(user);
 
         return savedUser;
@@ -111,6 +99,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         }
         user.setEnabled(true);
         userRepository.save(user);
+        tokenRepository.delete(token);
         return "valid";
     }
 
@@ -181,10 +170,7 @@ public class AuthenticationService implements AuthenticationServiceInterface {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return;
         }
-        // Old method
-        /* refreshToken = authHeader.substring(7); */
 
-        // New method
         refreshToken = authHeader.split(" ")[1].trim();
         userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
@@ -226,6 +212,24 @@ public class AuthenticationService implements AuthenticationServiceInterface {
     public boolean isLoggedIn() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
+    }
+
+    private void validateUserDoesNotExist(String email) {
+        Optional<User> existUser = userRepository.findByEmail(email);
+        if (existUser.isPresent()) {
+            throw new UserAlreadyExistsException(
+                    "User with email " + email + " already exists");
+        }
+    }
+
+    private User createUserFromRequest(RegisterRequest request) {
+        return User.builder()
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.USER)
+                .build();
     }
 
 }

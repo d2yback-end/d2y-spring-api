@@ -9,10 +9,10 @@ public interface UserServiceInterface {
 
     List<User> getAllUsers();
 
-    User getUserById(Integer id);
+    User getUserById(Long id);
 
-    void updateUserRole(Integer id, Role newRole);
+    void updateUserRole(Long id, Role newRole);
 
-    void deleteUser(Integer id);
+    void deleteUser(Long id);
 
 }

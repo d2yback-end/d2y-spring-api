@@ -26,6 +26,7 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
     private final JavaMailSender mailSender;
     private User theUser;
 
+    @Async
     @Override
     public void onApplicationEvent(RegistrationCompleteEvent event) {
         // 1. Get the newly registered user
@@ -54,6 +55,7 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
                 "<p>Thank you for registering with us," + "" +
                 "Please, follow the link below to complete your registration.</p>" +
                 "<a href=\"" + url + "\">Verify your email to activate your account</a>" +
+                // "<b>" + url + "</b>" +
                 "<p> Thank you <br> D2Y OFFICIAL";
 
         MimeMessage message = mailSender.createMimeMessage();
